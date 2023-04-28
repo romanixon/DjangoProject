@@ -1,0 +1,53 @@
+{% extends 'News/default.html' %}
+{% load custom_filters %}
+{% load custom_tags %}
+{% load cache %}
+{% cache 30 header %}
+{% block content %}
+<h1>Все новости ({{ news|length }})</h1>
+<form action="" method="get">
+    {{ filterset.form.as_p }}
+    <input type="submit" value="Найти"/>
+</form>
+
+<table>
+    <thead>
+    <tr>
+        <th>Заголовок</th>
+        <th>Дата публикации</th>
+        <th>Текст</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for post in news %}
+    <tr>
+        <td><a> {{ post.post_header|censor }}</a></td>
+        <td>{{ post.post_in|date:"d.m.Y" }}</td>
+        <td>{{ post.post_text|truncatewords:20 }}</td>
+
+    </tr>
+    </tbody>
+</table>
+{% endfor %}
+{% endcache %}
+
+{% if page_obj.has_previous %}
+<a href="?{% url_replace page=1 %}">1</a>
+{% if page_obj.previous_page_number != 1 %}
+...
+<a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+{% endif %}
+{% endif %}
+
+{{ page_obj.number }}
+
+{% if page_obj.has_next %}
+<a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+{% if paginator.num_pages != page_obj.next_page_number %}
+...
+<a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+{% endif %}
+{% endif %}
+
+{% endblock content %}
